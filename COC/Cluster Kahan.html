@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="Cluster%20Kahan_files/jroman.css">
+<title>Cluster Kahan</title>
+</head>
+
+<body>
+<div id="container">
+
+  <div style="text-align: right; margin-top: -15px;"><a href="http://personales.upv.es/jroman/kahan.html">[Castellano]</a>&nbsp;&nbsp;<b>[English]</b></div>
+
+  <h1 style="margin-top: 2em; margin-bottom: 1em;">Compute Cluster "Kahan"</h1>
+
+  <p><b>Kahan</b> is a small-size compute cluster belonging to <a href="https://www.upv.es/" target="_blank">Universitat Politècnica de València</a>. It has been funded, acquired and managed jointly by <a href="http://www.dsic.upv.es/" target="_blank">Departamento de Sistemas Informáticos y Computación</a> and <a href="https://www.upv.es/titulaciones/MUCPD" target="_blank">Máster Universitario en Computación en la Nube y de Altas Prestaciones</a>.</p>
+
+  <table style="margin: auto;">
+  <tbody><tr>
+    <td style="padding: 12pt;"><a href="https://www.upv.es/" target="_blank"><img src="Cluster%20Kahan_files/upv.png" alt="[UPV]" height="55"></a></td>
+    <td style="padding: 12pt; font-variant: small-caps; font-size: 115%; text-align: center;"><a style="text-decoration: none; color: #663300;" href="https://www.upv.es/titulaciones/MUCPD" target="_blank">
+      Máster en<br>
+      Computación en la Nube <br>
+      y de Altas Prestaciones
+    </a></td>
+    <td style="padding: 12pt;"><a href="http://www.dsic.upv.es/" target="_blank"><img src="Cluster%20Kahan_files/dsic.png" alt="[DSIC]" height="55"></a></td>
+  </tr>
+  </tbody></table>
+
+  <p>The cluster receives its name in honor of <a href="https://en.wikipedia.org/wiki/William_Kahan" target="_blank">William Kahan</a>, the main designer of the IEEE-754 standard for floating-point arithmetic.</p>
+
+  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+  <h3 style="padding-top: 5em">Hardware Configuration </h3>
+
+  <p>The cluster consists of 4 nodes connected by means of an fast Ethernet network.</p>
+
+  <p>Each node has:</p>
+  <ul>
+    <li>1 AMD EPYC 7551P processor with 32 physical cores (64 virtual cores)
+    </li><li>64GB of memory
+    </li><li>SSD hard drive of 240GB
+    </li><li>Ethernet 10/25Gb 2-port 622FLR -SFP28
+  </li></ul>
+  <p>Aggregated: 4 processors, 256 cores, 256 GB</p>
+
+  <p style="text-align:center;"><img src="Cluster%20Kahan_files/kahan.png" alt="[kahan]" height="180"></p>
+
+  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+  <h3 style="padding-top: 5em">Accessing the <i>Front-End</i></h3>
+
+  <p>To use the cluster one must log in on the header node (<i>front-end</i>), for instance connecting via <code>ssh</code>:</p>
+  <pre class="console">$ ssh -Y -l user@alumno.upv.es kahan.dsic.upv.es
+  </pre>
+  <p><u>Note</u>: replace <code>user</code> with the login name of the student.</p>
+
+  <p>Strictly speaking, the <i>front-end</i> computer does not belong to
+ the cluster. Its specifications are: one Intel Core i5-750 processor at
+ 2.67 GHz (4 cores), with 4 GB of memory.</p>
+
+  <p>The user's HOME directory is mounted both in the <i>front-end</i> and the nodes.</p>
+  <p>The student's network directory, <code>W</code>, is mounted in the <i>front-end</i> but not in the nodes, so it is not possible to submit a job when being in that directory (see <code>sbatch</code> command below).</p>
+  <p>The <code>/scratch</code> directory at the <i>front-end</i> is exported via NFS to all the nodes. This directory can be used to store large data files necessary during the execution.</p>
+  <p>
+  <u>Important</u>: the <i>front-end</i> machine must be used only for 
+routine tasks (editing and compilation of programs), not for long 
+executions. Any process whose CPU time exceeds 1 minute will be 
+eliminated from the system automatically.
+  </p>
+
+  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+  <h3 style="padding-top: 5em">Installed Software</h3>
+
+  <p>The software is installed in standard directories (with the package manager) and also in the <code>/opt</code> directory:
+  </p><ul>
+    <li>Operating system: Ubuntu 18.04.5 LTS
+    </li><li>Compilers: GNU 7.5.0 (gcc and gfortran, includes support for OpenMP 4.5)
+    </li><li>MPI: Open MPI 4.1.1
+  </li></ul>
+
+  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+  <h3 style="padding-top: 5em">Queue Manager</h3>
+
+  <p>Long executions must be run via any of the available queues:</p>
+  <table style="margin: auto;">
+  <tbody><tr>
+    <th style="padding: 3pt; text-align: left;">Queue</th>
+    <th style="padding: 3pt; text-align: left;">Users</th>
+  </tr>
+  <tr>
+    <td style="padding: 3pt;"><code>debug</code></td>
+    <td style="padding: 3pt;">Restricted use</td>
+  </tr>
+  <tr>
+    <td style="padding: 3pt;"><code>mcpd</code></td>
+    <td style="padding: 3pt;">Students of Máster Universitario en Computación Paralela y Distribuida</td>
+  </tr>
+  <tr>
+    <td style="padding: 3pt;"><code>cpa</code></td>
+    <td style="padding: 3pt;">Students of Parallel Computing course at ETSINF</td>
+  </tr>
+  <tr>
+    <td style="padding: 3pt;"><code>lpp</code></td>
+    <td style="padding: 3pt;">Students of Laboratory of Parallel Programming course at ETSINF</td>
+  </tr>
+  <tr>
+    <td style="padding: 3pt;"><code>coc</code></td>
+    <td style="padding: 3pt;">Students of Scientific Computing course at ETSINF</td>
+  </tr>
+  </tbody></table>
+
+  <p><u>Note</u>: Each queue has different settings. For example, in the <code>cpa</code> queue the maximum execution time is 10 minutes.</p>
+
+  <p>The software that manages the queues is <a href="https://slurm.schedmd.com/" target="_blank">SLURM</a>.
+ To submit jobs we recommend to create a script (see examples below), at
+ the beginning of which we include several SLURM options. The most 
+commonly used options are the following (to see all available options, 
+type <code>man sbatch</code>):
+  </p>
+  <ul>
+    <li><code>--nodes</code>: number of requested nodes
+    </li><li><code>--time</code>: required execution time
+    </li><li><code>--partition</code>: name of the queue (partition) where the job is submitted
+    </li><li><code>--ntasks</code>: total number of tasks
+    </li><li><code>--job-name</code>: job name
+    </li><li><code>--chdir</code>: directory in which the job must be run
+    </li><li><code>--output</code>: file name for output
+  </li></ul>
+
+  <p>The most commonly used queue manager commands are: <code>sbatch</code>, <code>squeue</code> and <code>scancel</code>.</p>
+
+  <p>The <u><code>sbatch</code> command</u> is used to submit a job. For example:</p>
+  <pre class="console">$ sbatch jobopenmp.sh
+Submitted batch job 11728
+  </pre>
+  <p>where <code>jobopenmp.sh</code> is a script that contains the SLURM options followed by the commands that we want to execute.
+  The number returned by <code>sbatch</code> is the job identifier.
+When the execution is finished, a file <code>slurm-11728.out</code> is created in the current directory that contains both the standard output and the standard error.
+  </p>
+
+  <p>The <u><code>squeue</code> command</u> can be used to check the status of a job.</p>
+  <pre class="console">$ squeue
+JOBID PARTITION NAME         USER ST TIME NODES NODELIST
+11728 cpa       jobopenmp.sh ramos R 0:01  1    kahan01          
+  </pre>
+  <p>The possible states are, among others: queued or pending (PD), running (R), ending (CD).
+  If a job does not appear in the list, it means it already finished.
+
+  </p><p>The <u><code>scancel</code> command</u> allows the cancellation of a job.</p>
+
+
+  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+  <h3 style="padding-top: 5em">Sample Script for OpenMP Programs</h3>
+
+  <p>For OpenMP programs we recommend using a script similar to the next one (<code>jobopenmp.sh</code>):</p>
+<pre class="srccode">#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --time=5:00
+#SBATCH --partition=cpa
+
+OMP_NUM_THREADS=8 ./progopenmp
+</pre>
+  <p>As you can see, only one node must be allocated. The queues in 
+kahan are configured in a way that the whole node is allocated (that is,
+ there will be no processes from other users in the same node). To 
+indicate the number of OpenMP threads, we recommend using the 
+environment variable <code>OMP_NUM_THREADS</code> within the script itself.</p>
+
+  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+  <h3 style="padding-top: 5em">Sample Script for MPI Programs</h3>
+
+  <p>For MPI programs we recommend using a script similar to the next one (<code>jobmpi.sh</code>):</p>
+<pre class="srccode">#!/bin/bash
+#SBATCH --nodes=4
+#SBATCH --ntasks=4
+#SBATCH --time=5:00
+#SBATCH --partition=cpa
+
+mpiexec ./progmpi
+</pre>
+  <p>As shown in the example, we use the <code>nodes</code> option to indicate the number of nodes to be used (four in this case) and the <code>ntasks</code> option to indicate the number MPI processes (one per node). In the <code>mpiexec</code> command it is not necessary to indicate the number of MPI processes, since the queue manager will create as many processes as <code>ntasks</code>.
+ Similarly as before, complete nodes are reserved, so the maximum number
+ of MPI processes is limited by the number of available nodes (further 
+below we explain how to run several processes in the same node).</p>
+
+  <p>By default, MPI programs use the 25Gb-ethernet network. Although it
+ is very uncommon, it is possible to force that the MPI communications 
+use the normal Ethernet network instead (the execution will be slower). 
+For this, the RoCE driver must be deactivated at <code>mpiexec</code>, for example like this:</p>
+<pre class="srccode">mpiexec --mca btl ^openib ./progmpi
+</pre>
+
+  <p>In case we want to place several MPI processes in the same node, we must set <code>ntasks</code> to a value larger than the number of nodes. For example, for 16 MPI processes in a single node:</p>
+<pre class="srccode">#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks=16
+#SBATCH --time=5:00
+#SBATCH --partition=cpa
+
+mpiexec ./progmpi
+</pre>
+  <p>You can include in the script the instruction <code>scontrol show hostnames $SLURM_JOB_NODELIST</code> to see which nodes have been assigned to the job.</p>
+
+  <p><u>Note</u>: The man pages for MPI routines are available.</p>
+<pre class="console">$ man MPI_Send
+</pre>
+
+  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+  <!--h3 style="padding-top: 5em">Frequently Asked Questions</h3>
+
+  <ul>
+    <li style="padding-top: 1em"><i style="color: blue">Question</i>: When submitting the job I get the message <code>qsub: submit error (Job exceeds queue resource limits MSG=cannot satisfy queue max walltime requirement)</code>.
+    <br><i style="color: green">Answer</i>: Some queues (for example <code>cpa</code>) have a limited execution time. Reduce the value of <code>walltime</code>.
+
+    <li style="padding-top: 1em"><i style="color: blue">Question</i>: My job stays queued indefinitely, while the jobs of other users enter to execution without problems.
+    <br><i style="color: green">Answer</i>: Maybe your are misusing the <code>ppn</code> option. Review the examples explained above.
+
+    <li style="padding-top: 1em"><i style="color: blue">Question</i>: I have submitted a job to use 6 nodes but it does not enter execution, even though the queue is empty.
+    <br><i style="color: green">Answer</i>: Some of the nodes might be down. This can be checked with the <code>pbsnodes</code> command.
+  </ul-->
+
+  <div id="separator"></div>
+  <div id="footer">
+    <p>Last update: 20 October 2021</p>
+  </div>
+
+</div>
+
+
+</body></html>
